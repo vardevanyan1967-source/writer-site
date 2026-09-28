@@ -18,6 +18,9 @@
   --font:"Noto Serif Armenian","Noto Serif",Georgia,"Times New Roman",serif;
   --read-size:1.15rem;
 }
+:root[data-theme="light"]{--parchment:#ffffff;--paper:#ffffff;--ink:#1a1a1a;--muted:#666;--line:#e3e3e3;--red:#7a1f26}
+:root[data-theme="dark"]{--parchment:#17130f;--paper:#211c16;--ink:#e6dac3;--muted:#a3927a;--line:#3a3227;--red:#e0959a}
+body{transition:background .25s,color .25s}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--parchment);color:var(--ink);font-family:var(--font);line-height:1.75;
@@ -34,7 +37,7 @@ nav{display:flex;gap:1.1rem;flex-wrap:wrap}
 nav a{text-decoration:none;color:var(--ink)}
 nav a:hover,nav a.on{color:var(--red);text-decoration:underline;text-underline-offset:.3em}
 .lang button{background:none;border:1px solid var(--line);color:var(--muted);padding:.2rem .6rem;cursor:pointer;font:inherit;font-size:.85rem}
-.lang button.on{background:var(--red);color:#fff;border-color:var(--red)}
+.lang button.on{background:#7a1f26;color:#fff;border-color:#7a1f26}
 
 /* Home */
 .hero{padding:4.5rem 0 3rem}
@@ -43,7 +46,7 @@ nav a:hover,nav a.on{color:var(--red);text-decoration:underline;text-underline-o
 h2{font-size:1.5rem;margin:2.5rem 0 1rem;color:var(--red)}
 .books{display:grid;grid-template-columns:repeat(auto-fill,minmax(7.5rem,1fr));gap:1.25rem;padding:0;list-style:none}
 .book a{display:block;text-decoration:none;color:var(--ink)}
-.cover{position:relative;overflow:hidden;aspect-ratio:2/3;background:var(--red);color:var(--parchment);display:flex;align-items:flex-end;padding:.8rem;
+.cover{position:relative;overflow:hidden;aspect-ratio:2/3;background:#7a1f26;color:#f3ead7;display:flex;align-items:flex-end;padding:.8rem;
   font-weight:600;line-height:1.3;border-left:6px solid rgba(0,0,0,.25);box-shadow:3px 4px 0 var(--line)}
 .book small{display:block;color:var(--muted);margin-top:.5rem}
 
@@ -63,7 +66,9 @@ ol.toc li{padding:.35rem 0;border-bottom:1px dotted var(--line)}
 
 /* Reader */
 .tools{position:sticky;top:0;background:var(--paper);border-bottom:1px solid var(--line);padding:.5rem 0;z-index:5}
-.tools .wrap{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.tools .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.4rem 1rem}
+.tools .grp{display:inline-flex;align-items:center;gap:.3rem}
+.tools button.on{background:#7a1f26;color:#fff;border-color:#7a1f26}
 .tools button{background:none;border:1px solid var(--line);padding:.2rem .7rem;font:inherit;cursor:pointer;color:var(--ink)}
 article.read{font-size:var(--read-size);line-height:1.9;padding:2rem 0 3rem}
 article.read h1{font-size:1.9rem;line-height:1.3;margin:0 0 1.5rem}
@@ -100,13 +105,13 @@ const SITE = {
   ui: {
     hy:{ home:"Գլխավոր", books:"Գրքեր", about:"Գրողի մասին", contact:"Կապ", read:"Կարդալ", toc:"Բովանդակություն",
          back:"← Գրքերին", prev:"← Նախորդ", next:"Հաջորդ →", bookpage:"Գրքի էջ", soon:"Շուտով",
-         size:"Տառաչափ", rights:"Բոլոր իրավունքները պաշտպանված են։", notfound:"Էջը չի գտնվել։" },
+         size:"Տառաչափ", th_light:"Սպիտակ", th_sepia:"Պերգամենտ", th_dark:"Մութ", rights:"Բոլոր իրավունքները պաշտպանված են։", notfound:"Էջը չի գտնվել։" },
     ru:{ home:"Главная", books:"Книги", about:"Об авторе", contact:"Контакты", read:"Читать", toc:"Содержание",
          back:"← К книгам", prev:"← Назад", next:"Далее →", bookpage:"Страница книги", soon:"Скоро",
-         size:"Размер шрифта", rights:"Все права защищены.", notfound:"Страница не найдена." },
+         size:"Размер шрифта", th_light:"Светлая", th_sepia:"Пергамент", th_dark:"Тёмная", rights:"Все права защищены.", notfound:"Страница не найдена." },
     en:{ home:"Home", books:"Books", about:"About", contact:"Contact", read:"Read", toc:"Contents",
          back:"← All books", prev:"← Previous", next:"Next →", bookpage:"Book page", soon:"Coming soon",
-         size:"Text size", rights:"All rights reserved.", notfound:"Page not found." }
+         size:"Text size", th_light:"Light", th_sepia:"Parchment", th_dark:"Dark", rights:"All rights reserved.", notfound:"Page not found." }
   },
   about:{
     hy:["Այստեղ կլինի գրողի կենսագրությունը։ Երկու-երեք պարբերություն՝ ծնունդ, կրթություն, գրական ուղի։"],
@@ -141,6 +146,9 @@ const SITE = {
    ============================================================ */
 let lang = (()=>{ try{ return localStorage.getItem("lang") }catch(e){ return null } })() || "hy";
 let size = 1.15;
+let theme = (()=>{ try{ return localStorage.getItem("theme") }catch(e){ return null } })() || "sepia";
+const applyTheme = () => document.documentElement.setAttribute("data-theme", theme);
+applyTheme();
 const $ = s => document.querySelector(s);
 const t = k => SITE.ui[lang][k];
 const L = o => (o && (o[lang] || o.hy)) || "";
@@ -195,7 +203,8 @@ const views = {
     const has = j => b.chapters[j] && b.chapters[j].text;
     return `<div class="tools"><div class="wrap">
         <a href="#/book/${b.id}">${esc(L(b.title))}</a>
-        <span>${t("size")} <button data-s="-1" aria-label="-">A−</button> <button data-s="1" aria-label="+">A+</button></span>
+        <span class="grp">${["light","sepia","dark"].map(k=>`<button data-th="${k}" class="${theme===k?"on":""}">${t("th_"+k)}</button>`).join("")}</span>
+        <span class="grp">${t("size")} <button data-s="-1" aria-label="-">A−</button><button data-s="1" aria-label="+">A+</button></span>
       </div></div>
       <article class="read"><h1>${esc(L(c.title))}</h1>${paras(L(c.text))}</article>
       <div class="pager">
@@ -224,6 +233,9 @@ function render(){
 document.addEventListener("click", e => {
   const l = e.target.closest("[data-l]");
   if(l){ lang = l.dataset.l; try{ localStorage.setItem("lang",lang) }catch(_){} render(); }
+  const th = e.target.closest("[data-th]");
+  if(th){ theme = th.dataset.th; applyTheme(); try{ localStorage.setItem("theme",theme) }catch(_){}
+          document.querySelectorAll("[data-th]").forEach(b => b.classList.toggle("on", b.dataset.th===theme)); }
   const s = e.target.closest("[data-s]");
   if(s){ size = Math.min(1.8, Math.max(.9, size + .1*(+s.dataset.s)));
          document.documentElement.style.setProperty("--read-size", size+"rem"); }
