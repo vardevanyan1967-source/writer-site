@@ -45,7 +45,7 @@ nav a:hover,nav a.on{color:var(--red);text-decoration:underline;text-underline-o
 .hero p{font-size:1.2rem;color:var(--muted);max-width:34rem;margin:0}
 h2{font-size:1.5rem;margin:2.5rem 0 1rem;color:var(--red)}
 .books{display:grid;grid-template-columns:repeat(auto-fill,minmax(7.5rem,1fr));gap:1.25rem;padding:0;list-style:none}
-@media (min-width:30rem){.books{grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:2rem}}
+@media (min-width:30rem){.books{grid-template-columns:repeat(4,1fr);gap:1.5rem}}
 .book a{display:block;text-decoration:none;color:var(--ink)}
 .cover{position:relative;overflow:hidden;aspect-ratio:2/3;background:#7a1f26;color:#f3ead7;
   font-weight:600;line-height:1.3;border-left:6px solid rgba(0,0,0,.25);box-shadow:3px 4px 0 var(--line)}
@@ -141,8 +141,16 @@ const L = o => (o && (o[lang] || o.hy)) || "";
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function coverHtml(b){
-  const img = b.cover ? `<img src="${b.cover}" alt="${esc(L(b.title))}" loading="lazy" onerror="this.remove()">` : "";
-  return `<div class="cover"><span>${esc(L(b.title))}</span>${img}</div>`;
+  const title = esc(L(b.title));
+  if(b.cover){
+    return `<div class="cover"><img src="${b.cover}" alt="${title}" data-title="${title}" loading="lazy" onerror="coverImgError(this)"></div>`;
+  }
+  return `<div class="cover"><span>${title}</span></div>`;
+}
+function coverImgError(img){
+  const span = document.createElement("span");
+  span.textContent = img.getAttribute("data-title") || "";
+  img.replaceWith(span);
 }
 
 function paras(text){
