@@ -47,12 +47,12 @@ h2{font-size:1.5rem;margin:2.5rem 0 1rem;color:var(--red)}
 .books{display:grid;grid-template-columns:repeat(auto-fill,minmax(7.5rem,1fr));gap:1.25rem;padding:0;list-style:none}
 @media (min-width:30rem){.books{grid-template-columns:repeat(4,1fr);gap:1.5rem}}
 .book a{display:block;text-decoration:none;color:var(--ink)}
-.cover{position:relative;overflow:hidden;aspect-ratio:2/3;background:#7a1f26;color:#f3ead7;
+.cover{position:relative;overflow:hidden;aspect-ratio:2/3;background:var(--parchment);color:#f3ead7;
   font-weight:600;line-height:1.3;border-left:6px solid rgba(0,0,0,.25);box-shadow:3px 4px 0 var(--line)}
 .cover>span{position:absolute;inset:0;display:flex;align-items:flex-end;padding:.8rem;z-index:1}
 .book small{display:block;color:var(--muted);margin-top:.5rem}
 
-.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:0}
+.cover img{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);object-fit:cover;display:block;z-index:0}
 .portrait{float:right;width:11rem;max-width:40%;margin:0 0 1rem 1.5rem;border:1px solid var(--line);box-shadow:3px 4px 0 var(--line)}
 .portrait img{display:block;width:100%;height:auto}
 .clear{clear:both}
