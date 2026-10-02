@@ -34,6 +34,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--red);outline-offset
 /* Header */
 header{border-bottom:2px solid var(--gold);background:var(--paper);box-shadow:0 1px 0 var(--line)}
 .bar{display:flex;flex-wrap:wrap;gap:.6rem 1.5rem;align-items:center;justify-content:space-between;padding-top:.9rem;padding-bottom:.9rem}
+header .wrap{max-width:66rem}
+@media (min-width:52rem){.bar{flex-wrap:nowrap}}
 .brand{font-weight:800;font-size:1.15rem;color:var(--red);text-decoration:none}
 nav{display:flex;gap:1.1rem;flex-wrap:wrap}
 nav a{text-decoration:none;color:var(--ink)}
