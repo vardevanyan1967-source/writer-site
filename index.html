@@ -122,6 +122,8 @@ footer{border-top:1px solid var(--line);padding:1.5rem 0 2.5rem;color:var(--mute
    1. ԲՈՎԱՆԴԱԿՈՒԹՅՈՒՆ — այստեղ փոխիր տվյալները
    ============================================================ */
 const SITE = {
+  /* Home-page quotation: poem title (Armenian) and the line range to show (1-based, inclusive). */
+  quote:  { title:"ԲԱԼԻԿԻՍ՝ ՄԱՐԻՆԱՅԻՆ", from:8, to:10 },
   name:   { hy:"Վլադիմիր Ավետիսյան" },
   photo:"img/writer.jpg",   /* գրողի լուսանկար։ Եթե ֆայլ չկա՝ չի ցուցադրվում */
   tagline:{ hy:"Բանաստեղծ" },
@@ -199,16 +201,23 @@ function heroPic(){
 }
 /* One short stanza from the first readable poem, shown as a quotation on the home page. */
 function heroQuote(){
+  const q = SITE.quote;
+  let first = null;
   for(const b of SITE.books){
     for(let i = 0; i < b.chapters.length; i++){
       const c = b.chapters[i]; const txt = c.text && L(c.text);
-      if(txt){
-        const lines = txt.split(/\n/).map(x => x.trim()).filter(Boolean).slice(0, 4).join("\n");
-        return `<blockquote class="quote">${esc(lines)}<cite>— <a href="#/read/${b.id}/${i}">${esc(L(c.title))}</a></cite></blockquote>`;
+      if(!txt) continue;
+      const all = txt.split(/\n/).map(x => x.trim()).filter(Boolean);
+      if(q && c.title && c.title.hy === q.title){
+        return quoteHtml(all.slice(q.from - 1, q.to), b, i, c);
       }
+      if(!first) first = [all.slice(0, 4), b, i, c];
     }
   }
-  return "";
+  return first ? quoteHtml(...first) : "";
+}
+function quoteHtml(lines, b, i, c){
+  return `<blockquote class="quote">${esc(lines.join("\n"))}<cite>— <a href="#/read/${b.id}/${i}">${esc(L(c.title))}</a></cite></blockquote>`;
 }
 
 const views = {
