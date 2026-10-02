@@ -50,7 +50,8 @@ nav a:hover,nav a.on{color:var(--red);text-decoration:underline;text-underline-o
 .hero h1{font-size:clamp(2.2rem,6vw,3.8rem);line-height:1.12;margin:0 0 .4rem;font-weight:800;color:var(--red)}
 .hero .tag{font-size:1.15rem;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin:0 0 1.6rem}
 .hero .tag::after{content:"";display:block;width:4.5rem;height:2px;background:var(--gold);margin-top:1rem}
-blockquote.quote{margin:0;padding:.2rem 0 .2rem 1.25rem;border-left:3px solid var(--gold);font-style:italic;font-size:1.15rem;line-height:1.8;white-space:pre-line;max-width:30rem}
+.quotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1.6rem 2rem}
+blockquote.quote{margin:0;padding:.2rem 0 .2rem 1.25rem;border-left:3px solid var(--gold);font-style:italic;font-size:1.1rem;line-height:1.8;white-space:pre-line}
 blockquote.quote cite{display:block;margin-top:.7rem;font-size:.9rem;color:var(--muted);font-style:normal;letter-spacing:.04em}
 blockquote.quote cite a{color:var(--muted)}
 h2{font-size:1.5rem;margin:2.5rem 0 1.2rem;color:var(--red);display:flex;align-items:center;gap:1rem}
@@ -122,8 +123,11 @@ footer{border-top:1px solid var(--line);padding:1.5rem 0 2.5rem;color:var(--mute
    1. ԲՈՎԱՆԴԱԿՈՒԹՅՈՒՆ — այստեղ փոխիր տվյալները
    ============================================================ */
 const SITE = {
-  /* Home-page quotation: poem title (Armenian) and the line range to show (1-based, inclusive). */
-  quote:  { title:"ԲԱԼԻԿԻՍ՝ ՄԱՐԻՆԱՅԻՆ", from:8, to:10 },
+  /* Home-page quotations: poem title (Armenian) and the line range to show (1-based, inclusive). */
+  quotes: [
+    { title:"ԻՍԿ ԴՈՒ ՉԵԿԱՐ",          from:1, to:4 },
+    { title:"ԲԱԼԻԿԻՍ՝ ՄԱՐԻՆԱՅԻՆ",     from:8, to:10 }
+  ],
   name:   { hy:"Վլադիմիր Ավետիսյան" },
   photo:"img/writer.jpg",   /* գրողի լուսանկար։ Եթե ֆայլ չկա՝ չի ցուցադրվում */
   tagline:{ hy:"Բանաստեղծ" },
@@ -201,20 +205,21 @@ function heroPic(){
 }
 /* One short stanza from the first readable poem, shown as a quotation on the home page. */
 function heroQuote(){
-  const q = SITE.quote;
-  let first = null;
-  for(const b of SITE.books){
-    for(let i = 0; i < b.chapters.length; i++){
-      const c = b.chapters[i]; const txt = c.text && L(c.text);
-      if(!txt) continue;
-      const all = txt.split(/\n/).map(x => x.trim()).filter(Boolean);
-      if(q && c.title && c.title.hy === q.title){
-        return quoteHtml(all.slice(q.from - 1, q.to), b, i, c);
+  const wanted = SITE.quotes || [];
+  const found = [];
+  for(const q of wanted){
+    outer: for(const b of SITE.books){
+      for(let i = 0; i < b.chapters.length; i++){
+        const c = b.chapters[i]; const txt = c.text && L(c.text);
+        if(txt && c.title && c.title.hy === q.title){
+          const all = txt.split(/\n/).map(x => x.trim()).filter(Boolean);
+          found.push(quoteHtml(all.slice(q.from - 1, q.to), b, i, c));
+          break outer;
+        }
       }
-      if(!first) first = [all.slice(0, 4), b, i, c];
     }
   }
-  return first ? quoteHtml(...first) : "";
+  return found.length ? `<div class="quotes">${found.join("")}</div>` : "";
 }
 function quoteHtml(lines, b, i, c){
   return `<blockquote class="quote">${esc(lines.join("\n"))}<cite>— <a href="#/read/${b.id}/${i}">${esc(L(c.title))}</a></cite></blockquote>`;
