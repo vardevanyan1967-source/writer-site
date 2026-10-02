@@ -200,6 +200,16 @@ function bookCard(b){
 }
 
 function yr(b){ return /^\d+$/.test(String(b.year)) ? b.year : t("unpublished"); }
+/* The PDF import left bare page numbers ("351", "352"...) as section names.
+   Chapters under such a "section" simply continue the previous real section. */
+SITE.books.forEach(b => {
+  let prev = null;
+  b.chapters.forEach(c => {
+    const label = c.group && c.group.hy != null ? String(c.group.hy).trim() : "";
+    if(c.group && /^\d+$/.test(label)) c.group = prev;
+    prev = c.group || null;
+  });
+});
 function initials(){
   return (SITE.name && SITE.name.hy || "").split(/\s+/).map(w => w[0]).join("");
 }
